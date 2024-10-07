@@ -1,0 +1,83 @@
+.main__header {
+  margin: 0.5rem;
+  height: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  row-gap: 0.5rem;
+}
+.container__search {
+  display: grid;
+  grid-template-columns: 35% 45% 20%;
+}
+.options {
+  display: flex;
+  justify-content: space-around;
+  gap: 2%;
+}
+
+.input__categories {
+  color: #253d4e;
+  background-color: #f3f3f3;
+  outline: none;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.625rem 0 0 0.625rem;
+}
+.input__search {
+  background-color: #f3f3f3;
+  flex-grow: 1;
+  outline: none;
+  border: none;
+  padding: 0.5rem;
+}
+
+.btn__search {
+  background-color:  #f6784c;
+  padding: 1rem;
+  border: none;
+  border-radius: 0 0.625rem 0.625rem 0;
+}
+.input__btn-1,
+.input__btn-2 {
+  height: 3.7rem;
+  border: none;
+  padding: 0 2rem;
+  width: 48%;
+  color: #fff;
+  font-family: Poppins;
+  font-size: 0.9rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 127%; /* 1.27rem */
+  border-radius: 0.625rem;
+}
+.input__btn-1 {
+  background-color: #f6784c;
+}
+.input__btn-2 {
+  background-color: #c4d600;
+}
+
+@media screen and (min-width: 564px) {
+  .container__search {
+    grid-template-columns: 20% 70% 10%;
+  }
+}
+@media screen and (min-width: 864px) {
+  .main__header {
+
+    flex-direction: row;
+    margin-bottom: 1rem;
+   
+  }
+  .container__search {
+    flex-grow: 1;
+  }
+
+  .container__search {
+    grid-template-columns: 20% 70% 10%;
+    padding-right: .5rem;
+  }
+}

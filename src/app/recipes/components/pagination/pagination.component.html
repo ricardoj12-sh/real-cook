@@ -1,0 +1,28 @@
+<section class="pagination container">
+  <div class="pagination__list">
+    <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage==1" class="pagination__btn"><img
+        src="./assets/img/icons/arrow-left.svg" alt=""></button>
+    <div class="pagination__container-pages">
+      <div *ngFor="let page of pagesToShow" [class.pagination__page--active]="page === currentPage"
+        class="pagination__page" (click)="onPageChange(page)">
+        {{ page }}
+      </div>
+
+      <div *ngIf="totalPages>maxPagesToShow &&
+        currentPage!=totalPages-1 && currentPage!=totalPages
+         && maxPagesToShow+1!=totalPages
+        &&totalPages -1 != currentPage+1
+
+        " class="pagination__page" (click)="onPageChange(maxPagesToShow+4)">
+        ...
+      </div>
+      <div [class.pagination__page--active]="totalPages === currentPage" class="pagination__page"
+        *ngIf="totalPages>maxPagesToShow && currentPage!=totalPages-1 && currentPage!=totalPages"
+        (click)="onPageChange(totalPages)">
+        {{totalPages}}
+      </div>
+    </div>
+    <button [disabled]="currentPage==totalPages" (click)="onPageChange(currentPage + 1)" class="pagination__btn"><img
+        src="./assets/img/icons/arrow-righ.svg" alt=""></button>
+  </div>
+</section>

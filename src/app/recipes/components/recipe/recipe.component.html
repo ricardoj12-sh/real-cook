@@ -1,0 +1,37 @@
+<main class="main container animate__animated animate__zoomIn">
+  <h1 class="app-title"> {{recipe?.strMeal}} </h1>
+  <ng-container *ngIf="recipe else load">
+    <div class="recipe__container">
+      <div class="recipe__view-container">
+        <img [src]="recipe.strMealThumb" alt="" class="recipe__img">
+      </div>
+      <div class="recipe__description-container">
+        <div class="recipe__ingredients-container">
+          <h2 class="recipe__ingredients-title">
+            Ingredientes:
+          </h2>
+          <ul class="recipe__ingredients-list">
+            <li *ngFor="let item of ingredientsWithMeasures" class="recipe__ingredient">
+              {{item.ingredient}} - {{item.measure}}
+          </ul>
+        </div>
+        <div class="recipe__preparation-container">
+          <h2 class="recipe__preparation-title">
+            Preparation :
+          </h2>
+          <p class="recipe__preparation-text">
+            {{recipe.strInstructions}}
+          </p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</main>
+
+<ng-template #load>
+  <div class="recipe__container">
+    <svg viewBox="25 25 50 50">
+      <circle r="20" cy="50" cx="50"></circle>
+    </svg>
+  </div>
+</ng-template>

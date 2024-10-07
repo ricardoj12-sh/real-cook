@@ -1,0 +1,39 @@
+<header class="main__header"> 
+  <div class="container__search">
+    <select name="" id="" class="input__categories" (input)="searchRecipeByCategory($event)">
+      <option value="">All categorias</option>
+      <option *ngFor="let category of categories" [value]="category?.strCategory">{{ category?.strCategory }}</option>
+    </select>
+    <input type="search" placeholder="Buscar por nombres" class="input__search" ngModel name="nombre" (input)="searchRecipe($event)">
+    <button class="btn__search">
+      <img src="./assets/img/li_search.svg" alt="buscar">
+    </button>
+  </div>
+</header>
+
+<form #recipeForm="ngForm" (ngSubmit)="onSubmit(recipeForm)">
+  <h2>Agregar Receta</h2>
+
+  <label for="strMeal">Nombre de la receta:</label>
+  <input type="text" id="strMeal" name="strMeal" ngModel required>
+
+  <label for="strCategory">Categoría:</label>
+  <select id="strCategory" name="strCategory" ngModel required>
+    <option *ngFor="let category of categories" [value]="category.strCategory">{{ category.strCategory }}</option>
+  </select>
+
+  <label for="strInstructions">Instrucciones:</label>
+  <textarea id="strInstructions" name="strInstructions" ngModel required></textarea>
+
+  <div *ngFor="let ingredient of ingredients; let i = index">
+    <label for="strIngredient{{i}}">Ingrediente {{i + 1}}:</label>
+    <input type="text" id="strIngredient{{i}}" name="strIngredient{{i}}" [(ngModel)]="ingredient.name">
+    
+    <label for="strMeasure{{i}}">Medida {{i + 1}}:</label>
+    <input type="text" id="strMeasure{{i}}" name="strMeasure{{i}}" [(ngModel)]="ingredient.measure">
+  </div>
+
+  <button type="button" (click)="addIngredient()" class="btn__add-ingredient">+</button>
+  
+  <button type="submit" class="btn__add-recipe">Agregar Receta</button>
+</form>
