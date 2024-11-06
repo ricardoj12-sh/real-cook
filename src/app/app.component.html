@@ -1,1 +1,12 @@
-<router-outlet></router-outlet>
+<nz-tabset>
+    <!-- Pestaña para el contenido general -->
+    <nz-tab nzTitle="Contenido General">
+      <router-outlet></router-outlet> <!-- Esto carga el contenido general -->
+    </nz-tab>
+  
+    <!-- Pestaña para Agregar Receta -->
+    <nz-tab nzTitle="Agregar Receta">
+      <app-form-recipe></app-form-recipe> <!-- Carga el formulario de agregar receta aquí -->
+    </nz-tab>
+  </nz-tabset>
+  

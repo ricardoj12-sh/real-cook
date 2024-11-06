@@ -1,29 +1,20 @@
-<header class="main__header"> 
-  <div class="container__search">
-    <select name="" id="" class="input__categories" (input)="searchRecipeByCategory($event)">
-      <option value="">All categorias</option>
-      <option *ngFor="let category of categories" [value]="category?.strCategory">{{ category?.strCategory }}</option>
-    </select>
-    <input type="search" placeholder="Buscar por nombres" class="input__search" ngModel name="nombre" (input)="searchRecipe($event)">
-    <button class="btn__search">
-      <img src="./assets/img/li_search.svg" alt="buscar">
-    </button>
-  </div>
-</header>
-
 <form #recipeForm="ngForm" (ngSubmit)="onSubmit(recipeForm)">
   <h2>Agregar Receta</h2>
 
   <label for="strMeal">Nombre de la receta:</label>
   <input type="text" id="strMeal" name="strMeal" ngModel required>
 
-  <label for="strCategory">Categoría:</label>
-  <select id="strCategory" name="strCategory" ngModel required>
-    <option *ngFor="let category of categories" [value]="category.strCategory">{{ category.strCategory }}</option>
-  </select>
-
   <label for="strInstructions">Instrucciones:</label>
   <textarea id="strInstructions" name="strInstructions" ngModel required></textarea>
+
+  <label for="strArea">Área:</label>
+  <input type="text" id="strArea" name="strArea" ngModel required placeholder="Ejemplo: RD">
+
+  <label for="strMealThumb">URL de la Imagen:</label>
+  <input type="text" id="strMealThumb" name="strMealThumb" ngModel required placeholder="Ejemplo: url_de_la_imagen">
+
+  <label for="strTags">Etiquetas:</label>
+  <input type="text" id="strTags" name="strTags" ngModel required placeholder="Ejemplo: fácil, rápido">
 
   <div *ngFor="let ingredient of ingredients; let i = index">
     <label for="strIngredient{{i}}">Ingrediente {{i + 1}}:</label>
@@ -34,6 +25,5 @@
   </div>
 
   <button type="button" (click)="addIngredient()" class="btn__add-ingredient">+</button>
-  
   <button type="submit" class="btn__add-recipe">Agregar Receta</button>
 </form>

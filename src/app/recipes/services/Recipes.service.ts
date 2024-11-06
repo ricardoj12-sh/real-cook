@@ -9,34 +9,29 @@ import {
   Meal,
   MealResponse,
 } from '../interfaces/recipes.interface';
-import {
-  EMPTY,
-  Observable,
-  catchError,
-  map,
-  of,
-} from 'rxjs';
+import { BehaviorSubject, EMPTY, Observable, catchError, map, of } from 'rxjs';
+import { BackendService } from './backend.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RecipesService {
-  private _pagedRecipes: Meal[] = [];
-  private _recipes: Meal[] = [];
+  private _recipes = new BehaviorSubject<Meal[]>([]); // Almacena todas las recetas
+  public recipes$ = new BehaviorSubject<Meal[]>([]); // Observable para suscribirse a las recetas paginadas
+  private newRecipeSubject = new BehaviorSubject<Meal | null>(null); // Emitir la receta nueva
+  public newRecipe$ = this.newRecipeSubject.asObservable(); // Observable para la receta nueva
   private cacheCategories: Category[] = [];
   private cacheCountry: Country[] = [];
-  
+
   private _currentPage = 1;
   private _pageSize = 10;
   private _totalPages = 0;
   private _totalProducts = 0;
 
-  get recipes() {
-    return [...this._recipes];
-  }
-
-  get pagedRecipes() {
-    return [...this._pagedRecipes];
+  get pagedRecipes(): Meal[] {
+    const startIndex = (this._currentPage - 1) * this._pageSize;
+    const endIndex = startIndex + this._pageSize;
+    return this._recipes.getValue().slice(startIndex, endIndex); // Obtener recetas paginadas
   }
 
   get currentPage() {
@@ -55,19 +50,23 @@ export class RecipesService {
     return this._totalProducts;
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private backendService: BackendService) {}
 
-  getRecipeById(id: string): Observable<Meal> {
-    return this.http
-      .get<MealResponse>(`${environment.apiUrl}lookup.php?i=${id}`)
-      .pipe(map(({ meals: [recipe] }) => recipe));
+  // Métodos existentes para llamadas a TheMealDB
+  getRecipeById(id: string): Observable<Meal | null> {
+    return this.backendService.getRecipeById(id).pipe(
+      map((recipe) => (recipe ? recipe : null)),
+      catchError((error) => {
+        console.error('Error al obtener la receta:', error);
+        return of(null);
+      })
+    );
   }
 
   addRecipe(recipe: Meal): Observable<Meal> {
     return this.http.post<Meal>(`${environment.apiUrl}add.php`, recipe).pipe(
-      map(response => {
-        this._recipes.push(response);
-        this.getDataPagination();
+      map((response) => {
+        this.addRecipeLocally(response);
         return response;
       }),
       catchError((error) => {
@@ -77,26 +76,31 @@ export class RecipesService {
     );
   }
 
-  searchRecipesByDishName(name: string) {
+  addRecipeLocally(recipe: Meal): void {
+    const currentRecipes = this._recipes.getValue();
+    this._recipes.next([recipe, ...currentRecipes]);
+    this.newRecipeSubject.next(recipe); // Emitir la receta nueva a través de newRecipe$
+    this.getDataPagination();
+  }
+
+  searchRecipesByDishName(name: string): void {
     this.http
       .get<MealResponse>(`${environment.apiUrl}search.php?s=${name}`)
       .pipe(
         catchError((error) => {
+          console.error(error);
           return EMPTY;
         })
       )
       .subscribe({
         next: (value) => {
-          this._recipes = value.meals ?? [];
+          this._recipes.next(value.meals ?? []);
           this.getDataPagination();
-        },
-        error: (err) => {
-          console.error(err);
         },
       });
   }
 
-  searchRecipesByCategories(category: string) {
+  searchRecipesByCategories(category: string): void {
     this.http
       .get<MealResponse>(`${environment.apiUrl}filter.php?c=${category}`)
       .pipe(
@@ -107,16 +111,13 @@ export class RecipesService {
       )
       .subscribe({
         next: (value) => {
-          this._recipes = value.meals ?? [];
+          this._recipes.next(value.meals ?? []);
           this.getDataPagination();
-        },
-        error: (err) => {
-          console.error(err);
         },
       });
   }
 
-  searchRecipesByCountry(country: string) {
+  searchRecipesByCountry(country: string): void {
     this.http
       .get<MealResponse>(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${country}`)
       .pipe(
@@ -127,11 +128,8 @@ export class RecipesService {
       )
       .subscribe({
         next: (value) => {
-          this._recipes = value.meals ?? [];
+          this._recipes.next(value.meals ?? []);
           this.getDataPagination();
-        },
-        error: (err) => {
-          console.error(err);
         },
       });
   }
@@ -155,7 +153,7 @@ export class RecipesService {
       return of(this.cacheCountry);
     }
     return this.http
-      .get<CountryResponse>(`${environment.apiUrl}list.php?a=list`)
+      .get<CountryResponse>('https://www.themealdb.com/api/json/v1/1/list.php?a=list')
       .pipe(
         map(({ meals: countries }) => {
           this.cacheCountry = countries;
@@ -167,33 +165,32 @@ export class RecipesService {
   getDataPagination() {
     this.calculateTotalPages();
     this.calculateTotalProducts();
-    this.updatePagedProducts();
+    this.updatePagedRecipes();
   }
 
   calculateTotalPages() {
-    this._totalPages = Math.ceil(this._recipes.length / this.pageSize);
+    this._totalPages = Math.ceil(this._recipes.getValue().length / this.pageSize);
   }
 
   calculateTotalProducts() {
-    this._totalProducts = this._recipes.length;
-  }
-
-  updatePagedProducts() {
-    if (this._currentPage > this.totalPage) {
-      this._currentPage = 1;
-    }
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this._pagedRecipes = this._recipes.slice(startIndex, endIndex);
+    this._totalProducts = this._recipes.getValue().length;
   }
 
   onPageChange(page: number) {
     this._currentPage = page;
-    this.updatePagedProducts();
+    this.updatePagedRecipes();
   }
 
   setPageSize(count: number) {
     this._pageSize = count;
     this.getDataPagination();
+  }
+
+  updatePagedRecipes() {
+    this.recipes$.next(this.pagedRecipes); // Actualiza recipes$ solo con las recetas paginadas
+  }
+
+  saveRecipeFromApi(id: string): Observable<Meal> {
+    return this.http.post<Meal>(`${environment.apiBackendUrl}/saveRecipeFromApi`, { id });
   }
 }

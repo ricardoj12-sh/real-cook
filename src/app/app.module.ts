@@ -16,6 +16,17 @@ import { PaginationComponent } from './recipes/components/pagination/pagination.
 import { FooterComponent } from './shared/footer/footer.component';
 import { RecipeComponent } from './recipes/components/recipe/recipe.component';
 import { FormsModule } from '@angular/forms';
+import { BackendService } from './recipes/services/backend.service';
+import { CommentsComponent } from './comment/comment.component';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { NZ_I18N } from 'ng-zorro-antd/i18n';
+import { en_US } from 'ng-zorro-antd/i18n';
+import { registerLocaleData } from '@angular/common';
+import en from '@angular/common/locales/en';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+registerLocaleData(en);
+
 
 @NgModule({
   declarations: [
@@ -30,6 +41,7 @@ import { FormsModule } from '@angular/forms';
     PaginationComponent,
     FooterComponent,
     RecipeComponent,
+    CommentsComponent,
   ],
   imports: [
     BrowserModule,
@@ -37,8 +49,10 @@ import { FormsModule } from '@angular/forms';
     RecipesRoutingModule,
     FormsModule,
     RouterModule,
+    NzTabsModule,
+    BrowserAnimationsModule,
   ],
-  providers: [],
+  providers: [BackendService, { provide: NZ_I18N, useValue: en_US }], // Agregado aquí
   bootstrap: [AppComponent],
 })
 export class AppModule {}

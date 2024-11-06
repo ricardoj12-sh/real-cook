@@ -92,4 +92,19 @@
   .recipe__card-container {
     margin-bottom: 2rem;
   }
+  .save-recipe-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 15px;
+    border-radius: 5px;
+  }
+  
+  .save-recipe-button:hover {
+    background-color: #45a049;
+  }
+  
+  
 }

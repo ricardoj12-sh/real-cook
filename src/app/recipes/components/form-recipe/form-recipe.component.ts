@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { RecipesService } from '../../services/Recipes.service';
 import { NgForm } from '@angular/forms';
-import { Category, Country, Meal } from '../../interfaces/recipes.interface';
+import { RecipesService } from '../../services/Recipes.service';
+import { BackendService } from '../../services/backend.service';
+import { Meal } from '../../interfaces/recipes.interface';
 
 @Component({
   selector: 'app-form-recipe',
@@ -9,55 +10,16 @@ import { Category, Country, Meal } from '../../interfaces/recipes.interface';
   styleUrls: ['./form-recipe.component.css'],
 })
 export class FormRecipeComponent implements OnInit {
-  @ViewChild('myForm') form!: NgForm;
-  categories: Category[] = [];
-  countries: Country[] = [];
+  @ViewChild('recipeForm') form!: NgForm; 
   ingredients: { name: string; measure: string }[] = [{ name: '', measure: '' }];
 
-  constructor(private recipeService: RecipesService) {}
+  constructor(
+    private recipeService: RecipesService,
+    private backendService: BackendService
+  ) {}
 
   ngOnInit(): void {
-    this.recipeService.getCategories().subscribe({
-      next: (categories) => {
-        this.categories = categories;
-      },
-      error: () => {},
-    });
-
-    this.recipeService.getCountries().subscribe({
-      next: (countries) => {
-        this.countries = countries;
-      },
-      error: () => {},
-    });
-    this.getRecipesDefault();
-  }
-
-  getRecipesDefault() {
-    this.recipeService.searchRecipesByDishName('a');
-  }
-
-  searchRecipeByCategory(event: Event) {
-    const category = (<HTMLInputElement>event?.target).value;
-    if (category === '' || category === null) {
-      this.getRecipesDefault();
-      return;
-    }
-    this.recipeService.searchRecipesByCategories(category);
-  }
-
-  searchRecipeByCountry(event: Event) {
-    const country = (<HTMLInputElement>event?.target).value;
-    if (country === '' || country === null) {
-      this.getRecipesDefault();
-      return;
-    }
-    this.recipeService.searchRecipesByCountry(country);
-  }
-
-  searchRecipe(event: any) {
-    const nombre = event.target.value;
-    this.recipeService.searchRecipesByDishName(nombre);
+    // Método requerido por OnInit, aunque esté vacío
   }
 
   addIngredient() {
@@ -68,16 +30,15 @@ export class FormRecipeComponent implements OnInit {
     if (form.invalid) {
       return;
     }
-  
+
     const newRecipe: Meal = {
-      idMeal: '',
       strMeal: form.value.strMeal || '',
       strCategory: form.value.strCategory || '',
       strInstructions: form.value.strInstructions || '',
       strDrinkAlternate: '',
-      strArea: '',
-      strMealThumb: '',
-      strTags: '',
+      strArea: form.value.strArea || '',
+      strMealThumb: form.value.strMealThumb || '',
+      strTags: form.value.strTags || '',
       strYoutube: '',
       strSource: '',
       strImageSource: undefined,
@@ -124,10 +85,11 @@ export class FormRecipeComponent implements OnInit {
       strMeasure19: this.ingredients[18]?.measure || '',
       strMeasure20: this.ingredients[19]?.measure || '',
     };
-  
-    this.recipeService.addRecipe(newRecipe).subscribe({
+
+    this.backendService.addRecipe(newRecipe).subscribe({
       next: (recipe) => {
         console.log('Receta agregada exitosamente:', recipe);
+        this.recipeService.addRecipeLocally(recipe); // Emitir la receta nueva
         form.reset();
         this.ingredients = [{ name: '', measure: '' }];
       },
@@ -136,6 +98,4 @@ export class FormRecipeComponent implements OnInit {
       },
     });
   }
-  
-  
 }

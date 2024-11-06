@@ -1,0 +1,12 @@
+<div>
+    <h3>Comentarios</h3>
+    <div *ngFor="let comment of comments">
+      <strong>{{ comment.user }}</strong>: {{ comment.content }}
+    </div>
+    <form (submit)="submitComment()">
+      <input [(ngModel)]="newComment.user" placeholder="Tu nombre" required />
+      <textarea [(ngModel)]="newComment.content" placeholder="Deja un comentario" required></textarea>
+      <button type="submit">Enviar Comentario</button>
+    </form>
+  </div>
+  

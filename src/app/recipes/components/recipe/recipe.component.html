@@ -1,27 +1,55 @@
 <main class="main container animate__animated animate__zoomIn">
-  <h1 class="app-title"> {{recipe?.strMeal}} </h1>
+  <h1 class="app-title"> {{ recipe?.strMeal }} </h1>
   <ng-container *ngIf="recipe else load">
     <div class="recipe__container">
       <div class="recipe__view-container">
-        <img [src]="recipe.strMealThumb" alt="" class="recipe__img">
+        <img [src]="recipe.strMealThumb" alt="{{ recipe.strMeal }}" class="recipe__img" />
       </div>
       <div class="recipe__description-container">
+        
         <div class="recipe__ingredients-container">
-          <h2 class="recipe__ingredients-title">
-            Ingredientes:
-          </h2>
+          <h2 class="recipe__ingredients-title">Ingredientes:</h2>
           <ul class="recipe__ingredients-list">
             <li *ngFor="let item of ingredientsWithMeasures" class="recipe__ingredient">
-              {{item.ingredient}} - {{item.measure}}
+              {{ item.ingredient }} - {{ item.measure }}
+            </li>
           </ul>
         </div>
         <div class="recipe__preparation-container">
-          <h2 class="recipe__preparation-title">
-            Preparation :
-          </h2>
-          <p class="recipe__preparation-text">
-            {{recipe.strInstructions}}
-          </p>
+          <h2 class="recipe__preparation-title">Preparación:</h2>
+          <p class="recipe__preparation-text">{{ recipe.strInstructions }}</p>
+        </div>
+        
+        <!-- Botón para guardar la receta, solo visible si no está guardada en la base de datos -->
+<!-- Botón para guardar la receta, solo visible si no está guardada en la base de datos -->
+<div *ngIf="!isRecipeSaved" class="save-recipe-container">
+  <button (click)="saveRecipe()" class="save-recipe-button">Guardar receta en la base de datos</button>
+</div>
+  
+
+        <!-- Sección de comentarios -->
+        <div class="comments-container">
+          <h2 class="comments-title">Comentarios:</h2>
+          <div class="comments-list">
+            <div *ngFor="let comment of comments" class="comment-item">
+              <strong>{{ comment.user }}:</strong> {{ comment.content }}
+            </div>
+          </div>
+          <div class="comment-form">
+            <h3>Deja un comentario:</h3>
+            <input 
+              type="text" 
+              [(ngModel)]="newComment.user" 
+              placeholder="Tu nombre" 
+              class="comment-input" 
+            />
+            <textarea 
+              [(ngModel)]="newComment.content" 
+              placeholder="Escribe tu comentario..." 
+              class="comment-textarea">
+            </textarea>
+            <button (click)="submitComment()" class="comment-submit-button">Enviar</button>
+          </div>
         </div>
       </div>
     </div>
@@ -31,7 +59,8 @@
 <ng-template #load>
   <div class="recipe__container">
     <svg viewBox="25 25 50 50">
-      <circle r="20" cy="50" cx="50"></circle>
+      <circle r="20" cy="50"></circle>
     </svg>
+    <p>Cargando receta...</p>
   </div>
 </ng-template>

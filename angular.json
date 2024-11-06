@@ -25,9 +25,17 @@
                 "output": "/"
               },
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@ant-design/icons-angular/src/inline-svg/",
+                "output": "/assets/"
+              }
             ],
-            "styles": ["src/styles.css"],
+            "styles": [
+              "src/theme.less",
+              "src/styles.css"
+            ],
             "scripts": []
           },
           "configurations": {
